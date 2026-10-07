@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+body { margin:0; font-family:Arial,sans-serif; background:#eef3f7; color:#243447; }
+.contenedor { max-width:1000px; margin:30px auto; padding:20px; }
+header { background:#123b5d; color:white; padding:25px; border-radius:12px; margin-bottom:20px; }
+.panel { background:white; padding:25px; margin-bottom:20px; border-radius:12px; }
+label { display:block; font-weight:bold; margin-top:15px; margin-bottom:5px; }
+input, textarea { width:100%; padding:10px; border:1px solid #b9c6cf; border-radius:6px; }
+button { margin-top:18px; padding:12px 20px; }
+.mensaje { padding:15px; margin:20px 0; background:#e7f5ec; }
+.tabla-responsive { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:12px; border-bottom:1px solid #dce5eb; text-align:left; }

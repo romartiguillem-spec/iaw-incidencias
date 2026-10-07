@@ -1,0 +1,75 @@
+name: CI PHP + MariaDB
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pruebas-integracion:
+    runs-on: ubuntu-latest
+
+    container:
+      image: debian:13
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: incidencias
+          MARIADB_USER: app_incidencias
+          MARIADB_PASSWORD: clave_ci
+          MARIADB_ROOT_PASSWORD: root_ci
+
+    env:
+      DB_HOST: mariadb
+      DB_NAME: incidencias
+      DB_USER: app_incidencias
+      DB_PASS: clave_ci
+
+    steps:
+      - name: Preparar Debian
+        run: |
+          apt-get update
+          apt-get install -y git ca-certificates php-cli php-mysql mariadb-client
+
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Mostrar entorno
+        run: |
+          cat /etc/os-release
+          php -v
+          php -m | grep -E 'PDO|pdo_mysql'
+
+      - name: Comprobar sintaxis PHP
+        run: |
+          find . -type f -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Esperar a MariaDB
+        run: |
+          for i in $(seq 1 30); do
+            if mariadb-admin ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" --silent; then
+              echo "MariaDB está disponible"
+              exit 0
+            fi
+            echo "Esperando a MariaDB... intento $i/30"
+            sleep 2
+          done
+          exit 1
+
+      - name: Cargar esquema
+        run: |
+          mariadb -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < sql/01_esquema.sql
+
+      - name: Cargar datos de prueba
+        run: |
+          mariadb -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < sql/02_datos_prueba.sql
+
+      - name: Verificar datos iniciales
+        run: |
+          TOTAL=$(mariadb -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -Nse "SELECT COUNT(*) FROM incidencias;")
+          echo "Registros iniciales: $TOTAL"
+          test "$TOTAL" -eq 3
+
+      - name: Prueba de integración PHP + PDO + MariaDB
+        run: php tests/test_integracion.php
