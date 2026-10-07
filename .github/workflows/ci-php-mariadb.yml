@@ -24,7 +24,7 @@ jobs:
       DB_HOST: mariadb
       DB_NAME: incidencias
       DB_USER: app_incidencias
-      DB_PASS: clave_falsa
+      DB_PASS: clave_ci
 
     steps:
       - name: Preparar Debian
