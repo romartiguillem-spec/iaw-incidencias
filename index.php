@@ -1,11 +1,11 @@
 <?php
 require 'conexion.php';
 
-$mensaje = ''
+$mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = trim($_POST['usuario'] ?? '')
-    $equipo = trim($_POST['equipo'] ?? '')
+    $usuario = trim($_POST['usuario'] ?? '');
+    $equipo = trim($_POST['equipo'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
 
     if ($usuario !== '' && $equipo !== '' && $descripcion !== '') {
